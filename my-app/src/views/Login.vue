@@ -1,10 +1,9 @@
 <template lang="pug">
-    div
         login-box
 </template>
 <script>
     // import axios from 'axios'
-    import LoginBox from '../components/loginBox'
+    import LoginBox from '../components/core/loginBox'
     export default {
         name: 'Login',
         components: {
