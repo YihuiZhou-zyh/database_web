@@ -82,7 +82,8 @@
             getHomeInfoSucc (res) {
                 res = res.data
                 if (res.status === 'success') {
-                    this.identity = res.identity;
+
+                    this.$store.state.identity = res.data.identity;
                     this.$router.push('./home')
                 }
             },

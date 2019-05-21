@@ -19,7 +19,6 @@
                                     v-btn.mx-0.font-weight-light(color='success')
                                         | Update Profile
             v-flex(xs12='', md4='')
-                material-card.v-card-profile
                     v-avatar.mx-auto.d-block(slot='offset', size='130')
                         img(src='api/cute.jpg')
                     v-card-text.text-xs-center
@@ -32,6 +31,7 @@
 
 <script>
     import Card from "../components/material/Card";
+    import {mapMutations} from "vuex";
 
     export default {
         name: "UserProfile",
@@ -49,12 +49,14 @@
             }
         },
         computed:{
+            ...mapMutations(['getIdentityName']),
             identity_name:{
                 get() {
+                    console.log(this.$store.state.identity)
                     return this.identity_to_name[this.$store.state.identity]
                 },
                 set(val){
-                    return this.$store.state.identity
+                    return this.getIdentityName
                 }
             }
         }

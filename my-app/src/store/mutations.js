@@ -6,5 +6,9 @@ export default {
             localStorage.step = step
         }catch (e) {}
     },
-    setDrawer: set('drawer')
+    setDrawer: set('drawer'),
+    getIdentityName(state){
+
+        return state.indentity_to_name[state.identity]
+    }
 }
