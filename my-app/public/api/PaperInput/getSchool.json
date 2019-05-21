@@ -1,0 +1,14 @@
+{
+  "status":"success",
+  "message":null,
+  "data":[
+    {
+      "id":"123",
+      "name":"市三女中"
+    },
+    {
+      "id":"111",
+      "name":"上海中学"
+    }
+  ]
+}
