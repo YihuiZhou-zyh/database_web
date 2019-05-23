@@ -1,10 +1,14 @@
-<template>
-    
+<template lang="pug">
+    userManage
 </template>
 
 <script>
+    import userManage from '../components/material/userManage'
     export default {
-        name: "ManageUser"
+        name: "ManageUser",
+        components: {
+            userManage
+        },
     }
 </script>
 
