@@ -3,70 +3,76 @@
         .center-container
             .panel
                 header.header 登录
-                .form-group
-                v-form.align-center(ref='form')
-                    v-layout.column
-                        v-flex
-                            v-layout.row
-                                v-flex
-                                    v-text-field(v-model='message', label='请输入手机号',
-                                type='text')
-                                v-spacer
-                                v-flex
-                                    v-btn(@click="sendMessage") {{content}}
-                        <!--v-text-field(v-model='phone' outline  :rules='rules', label='请输入手机号')-->
-                        v-flex
-                            v-layout.row
-                                v-flex
-                                    v-text-field(v-model='msg' :rules='rules', label='请输入验证码' width="7rem")
-                                v-flex.md6
-                        v-btn.commit(type='primary', round='', @click='handleLogin') 提交
+                v-tabs(v-model="active" color='transparent', light, slider-color='grey')
+                    v-tab(ripple) 账户密码登录
+                    v-tab-item
+                        //v-card(flat)
+                        .form-group
+                            v-form.align-center(ref='form')
+                                v-layout.column#lay
+                                    v-flex
+                                        v-layout.row
+                                            v-flex
+                                                v-text-field(v-model='phone', label='请输入手机号' :rules='[rules.required, rules.counter]' counter
+                                                type='text')
+                                    <!--v-text-field(v-model='phone' outline  :rules='rules', label='请输入手机号')-->
+                                    v-flex
+                                        v-layout.row
+                                            v-flex
+                                                v-text-field(v-model='password',
+                                                :append-icon="show1 ? 'visibility' : 'visibility_off'",
+                                                :rules='[rules.required, rules.min]',
+                                                :type="show1 ? 'text' : 'password'",
+                                                name='input-10-1', label='请输入密码', hint='至少8个字符', counter @click:append='show1 = !show1')
+                                                h6.category.text-gray.font-weight-thin.mb-3.shadow.pa-1  忘记密码请用手机登录，会直接修改密码噢
+                                v-btn.commit(type='primary', round='', @click.prevent='handleLogin') 提交
+                    v-tab(ripple) 手机登录
+                    v-tab-item
+                        //v-card(flat)
+                        .form-group
+                            v-form.align-center(ref='form')
+                                v-layout.column#lay
+                                    v-flex
+                                        v-layout.row
+                                            v-flex
+                                                v-text-field(v-model="phone" label='请输入手机号' type='text')
+                                    <!--v-text-field(v-model='phone' outline  :rules='rules', label='请输入手机号')-->
+                                    v-flex
+                                        v-layout.row
+                                            v-flex
+                                                v-text-field(v-model='msg' :rules='rules', label='请输入验证码')
+                                            v-flex.d-flex.py-2
+                                                v-btn(@click.prevent="sendMessage") {{content}}
+                                v-btn.commit(type='primary', round='', @click.prevent='handleLogin') 提交
 </template>
 
 
 <script>
+    import axios from 'axios'
     export default {
         data: () => ({
-            allowSpaces: false,
+            phone:'',
             match: 'meow',
+            tabs:[
+                '手机登录','帐号密码登录'
+            ],
+            active: null,
             max: 0,
             msg:'',
-            password: 'Password',
+            password: '',
             show: false,
-            message: 'Hey!',
             total: '30',
             content: "发送验证码",
-            canClick: true
+            canClick: true,
+            show1: false,
+            rules: {
+                required: value => !!value || '不能为空',
+                min: v => v.length >= 8 || '至少6个字符',
+                counter: v => v.length <=11 || "手机号为11位"
+            }
         }),
 
         computed: {
-            rules () {
-                const rules = []
-
-                if (!this.allowSpaces) {
-                    const rule =
-                        v => (v || '').indexOf(' ') < 0 ||
-                            'No spaces are allowed'
-
-                    rules.push(rule)
-                }
-
-                if (this.match) {
-                    const rule =
-                        v => (!!v && v) === this.match ||
-                            '输入有误'
-
-                    rules.push(rule)
-                }
-
-                return rules
-            }
-        },
-
-        watch: {
-            match: 'validateField',
-            max: 'validateField',
-            model: 'validateField'
         },
 
         methods: {
@@ -75,16 +81,46 @@
                 this.countDown()
             },
             handleLogin () {
-                if(!this.account)
-                    axios.get('/api/PaperInput/loginSucc.json')
-                        .then(this.getHomeInfoSucc);
+                let post_data = {
+                    user_id: this.phone,
+                    password: this.password
+                };
+                console.log(this.phone+this.password)
+                this.$refs['ruleForm']
+                if(this.phone!='' && this.password!='')
+                    {
+
+                    axios.post('/api/login',post_data)
+                            .then(this.getHomeInfoSucc)
+                    }
+                else {
+                    this.$message({
+                        message: '你没有填帐号或者密码噢',
+                        type: 'warning'
+                    });
+                }
+
+
+
             },
             getHomeInfoSucc (res) {
                 res = res.data
                 if (res.status === 'success') {
-
                     this.$store.state.identity = res.data.identity;
+                    this.$store.state.user_id = res.data.userId;
+                    this.$store.state.user_name = res.data.userName;
+                    //"identity":"3","userName":"zyh","userId":"6"
                     this.$router.push('./home')
+                    this.$message({
+                        message: '成功登录',
+                        type: 'success'
+                    });
+                }
+                else if(res.status === "fail" ){
+                    this.$message({
+                        message: '账户或密码错误',
+                        type: 'fail'
+                    });
                 }
             },
 
@@ -107,24 +143,6 @@
 
     }
 
-
-
-    //
-    // import axios from 'axios'
-    // export default {
-    //     name: '"LoginBox"',
-    //     data () {
-    //         return {
-    //             account:'',
-    //             pass: '',
-    //             identity: ''
-    //         }
-    //     },
-    //
-    //     methods: {
-
-    //     }
-    // }
 </script>
 
 <style lang='stylus' scoped>
@@ -142,14 +160,14 @@
         align-items: center;
         .panel
             width: 350px;
+            min-height: 368px
             position: relative
             text-shadow: rgba(0, 0, 0, 0.4) 1px 1px 4px;
             box-shadow: rgb(0, 0, 0) 0px 0px 10px;
             overflow: hidden;
             padding: 20px;
             border-radius: 10px;
-            .flash
-                box-sizing: border-box;
+
             .header
                 text-align: center;
                 font-size: 3rem;
@@ -157,8 +175,12 @@
                 text-transform: uppercase;
                 margin-bottom: 0.5rem;
             .form-group
-                margin: 2.5rem 0 10px
+                margin: 1rem
+            #lay
+                overflow :hidden
 
             .commit
                 width:80%
+                /*padding : 0.5rem 0rem 0.5rem 3rem */
+
 </style>

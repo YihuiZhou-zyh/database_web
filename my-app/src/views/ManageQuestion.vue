@@ -2,7 +2,7 @@
     div this is manageQuestion
 </template>
 
-<script>
+<script >
     export default {
         name: "ManageQuestion"
     }

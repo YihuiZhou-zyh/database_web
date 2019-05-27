@@ -32,6 +32,9 @@ export default {
         title: {
             get(){
                 return this.$route.name
+            },
+            set(){
+
             }
         }
     },
@@ -52,7 +55,6 @@ export default {
         ...mapMutations(['setDrawer']),
         onClickBtn () {
             this.setDrawer(!this.$store.state.drawer)
-            console.log(this.$store.state.drawer)
         },
         onResize () {
             this.windowSize = {
@@ -61,13 +63,11 @@ export default {
 
             };
 
-            console.log(this.windowSize.x)
             this.responsive = this.windowSize.x < 991;
         }
     },
     watch: {
         '$route' (val) {
-            console.log(val.name)
             this.title = val.name
         }
     },

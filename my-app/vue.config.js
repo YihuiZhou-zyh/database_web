@@ -56,7 +56,8 @@ module.exports = {
                 'assets': '@/assets',
                     'components': '@/components',
                     'views': '@/views',
-                '^api': '/home/amo/文档/web_db/my-app/public/api'
+                // '^api': '/home/amo/文档/web_db/my-app/public/api'
+                '^api': 'www.tyq.ac.cn:8081/api'
             }
         }
     },
@@ -104,22 +105,32 @@ module.exports = {
 //
 //     // All options for webpack-dev-server are supported
 //     // https://webpack.js.org/configuration/dev-server/
-//     devServer: {
-//         open: true,
-//
-//         host: '127.0.0.1',
-//
-//         port: 3000,
-//
-//         https: false,
-//
-//         hotOnly: false,
-//
-//         proxy: null,
-//
-//         before: app => {
-//         }
-//     },
+    devServer: {
+        // open: true,
+        //
+        // host: 'www.tyq.ac.cn',
+        //
+        // port: 8081,
+        //
+        // https: false,
+        //
+        // hotOnly: false,
+
+        proxy: {
+            '/api': {
+                target: 'http://www.tyq.ac.cn:8081', //对应自己的接口
+                changeOrigin: true,
+                ws: false,
+                pathRewrite: {
+                    '^/api': '/api'
+                }
+            }
+        },
+
+        // before: app => {
+        // }
+    },
+
 //     // 构建时开启多进程处理 babel 编译
 //     parallel: require('os').cpus().length > 1,
 //

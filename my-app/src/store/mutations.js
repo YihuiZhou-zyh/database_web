@@ -8,7 +8,6 @@ export default {
     },
     setDrawer: set('drawer'),
     getIdentityName(state){
-
         return state.indentity_to_name[state.identity]
     }
 }

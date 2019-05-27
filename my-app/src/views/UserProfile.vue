@@ -30,13 +30,11 @@
 </template>
 
 <script>
-    import Card from "../components/material/Card";
     import {mapMutations} from "vuex";
 
     export default {
         name: "UserProfile",
         components:{
-            Card
         },
         data(){
             return{
@@ -52,10 +50,10 @@
             ...mapMutations(['getIdentityName']),
             identity_name:{
                 get() {
-                    console.log(this.$store.state.identity)
                     return this.identity_to_name[this.$store.state.identity]
                 },
                 set(val){
+                    val = val--
                     return this.getIdentityName
                 }
             }

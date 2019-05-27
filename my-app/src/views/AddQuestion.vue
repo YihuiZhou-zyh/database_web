@@ -14,7 +14,7 @@
 
 </template>
 
-<script>
+<script >
 import  addQStep1 from '../components/material/addQStep1'
 import addQStep2 from '../components/material/addQStep2'
 import {mapState} from 'vuex'
