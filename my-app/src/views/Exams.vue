@@ -7,7 +7,7 @@
             <el-step title="步骤 2"></el-step>
             <el-step title="步骤 3"></el-step>
             </el-steps>
-            <div class="ddiv" id='div1'>
+            <!-- <div class="ddiv" id='div1'>
                 选择学校
              <el-select v-model="schoolsValue" placeholder="请选择学校名称">
                 <el-option
@@ -17,7 +17,7 @@
                 :value="item.value">
                 </el-option>
             </el-select>
-            </div>
+            </div> -->
              <div class="ddiv" label-width='100px' id='div2'>
                 选择科目
              <el-select v-model="subjectsValue" placeholder="请选择科目">
@@ -87,7 +87,7 @@
                     请选择解答题数量: <el-input-number v-model="numAn"></el-input-number>
                 </div>
                 <div>
-                    <el-select v-model="difficult" placeholder="请选择难度系数">
+                    请选择难度系数: <el-select v-model="difficult" placeholder="请选择难度系数">
                         <el-option
                         v-for="item in diffic"
                         :key="item.value"
@@ -115,18 +115,27 @@
                 </div>
             </div>
             <div id="div6" v-show="false">
+                <div id='div7'>
                 <h3>试卷预览</h3>
+                <div id="chooseDiv"></div>
+                <div id='blankDiv'></div>
+                <div id='answerDiv'></div>
+                </div>
+                <el-button style="margin-top: 12px;" @click="print">输出word文档</el-button>
 
             </div>
             <el-button :plain="true" @click="lack()" v-show="false" v-model="lackValue" id='lackId'></el-button>
             <el-button style="margin-top: 12px;" @click="next">下一步</el-button>
         </div>
     </el-tab-pane>
-    <el-tab-pane label="手动组卷" name="second">手动组卷</el-tab-pane>
+    <el-tab-pane label="手动组卷" name="second">
+        暂停服务
+    </el-tab-pane>
   </el-tabs>
 </template>
 <script>
 import { all } from 'q';
+import axios from 'axios'
   export default {
     data() {
         const generateData = _ => {
@@ -143,7 +152,7 @@ import { all } from 'q';
         return data;
       };
       return {
-          data: generateData(),
+        data: generateData(),
         secondValue: [],
         filterMethod(query, item) {
           return item.pinyin.indexOf(query) > -1;
@@ -219,7 +228,7 @@ import { all } from 'q';
             },
 
         ],
-        schoolsValue: '',
+        //schoolsValue: '',
         subjectsValue: '',
         classValue: '',
         lackValue: '',
@@ -241,7 +250,7 @@ import { all } from 'q';
         numChoose: 1,//选择题数量
         numBlank: 1, //填空题数量
         numAn: 1, //解答题数量
-        difficult: 0.0, //选择的难度系数
+        difficult: 0.4, //选择的难度系数
         diffic: [  //难度系数
             {
                 value: 0.4,
@@ -257,22 +266,30 @@ import { all } from 'q';
             }
         ],
         centerDialogVisible: false,
-
-
+        choose: [],
+        blank: [],
+        answer: [],
       };
+    },
+    mounted(){
+       window.alert('Kaishile')
+       this.getSubjects()
+       
     },
     methods: {
       handleClick(tab, event) {
         console.log(tab, event);
       },
       check(){
-          return this.schoolsValue!=''&&this.subjectsValue!=''&&this.classValue!='';
+          return this.subjectsValue!=''&&this.classValue!='';
       },
       next() {
           if(this.active==0){
               if(this.check()==true){
+                  //window.alert(this.active)
                   this.active++;
-                  document.getElementById('div1').style.display='none';
+                  //getFirstKown(this.subjectsValue);获取一级知识点
+                  //document.getElementById('div1').style.display='none';
                   document.getElementById('div2').style.display='none';
                   document.getElementById('div3').style.display='none';
                   document.getElementById('div4').style.display='inline'
@@ -282,6 +299,9 @@ import { all } from 'q';
               }
           }
           else if(this.active==1){
+              //window.alert(this.active)
+              //获取二级知识点
+              //getSecondKown(this.fisrtKonwn);
               if(this.kownList!=null){
                   this.kownList.forEach((kown,index) =>{
                       this.tags.push({
@@ -300,18 +320,24 @@ import { all } from 'q';
 
               //window.alert(2)
           }
-          else{
+          else if(this.active==2){
               //window.alert(3)
-
-              // this.active = 0;
-               this.centerDialogVisible=true;
-
+                //window.alert(this.active)
+              //this.active = 0;
+              this.centerDialogVisible=true;
+              this.active++;
           }
-        
+          else if(this.active==3){
+              //window.alert(this.active)
+              this.active=0;
+              //document.getElementById('div4').style.display='none'
+              location.reload()
+               
+          }
       },
       lack(){
           this.$message({
-          message: '请选择学校，年级，科目',
+          message: '请选择年级，科目',
           type: 'warning'
         });
       },
@@ -368,7 +394,183 @@ import { all } from 'q';
           this.centerDialogVisible=false;
           document.getElementById('div5').style.display='none';
           document.getElementById('div6').style.display='inline';
+         // this.seePaper();
+          axios({
+                url: '/api/generatePaper',
+                data: {
+                  secondKown: this.tags,
+                  numChoose: this.numChoose,
+                  numBlank: this.numBlank,
+                  numAn: this.numAn,
+                  difficult: this.difficult,
+                  user_id: this.$store.state.user_id
+                },
+                headers: {
+                  'Content-Type': 'application/json;charset=UTF-8'
+                },
+                method: 'post',
+              }).then((response) => {
+                let res = response.data;
+                if (res.status === "success") {
+                   //后端回传
+                   this.choose=res.choose,
+                   this.blank=res.blank,
+                   this.answer=res.answer
+                   this.seePaper();
+                }
+                else{
+                    window.alert('生成试卷失败');
+                }
+            }
+            )
           //返回给后端.....
+      },
+      getSubjects(){
+          let post_data={
+              user_id: this.$store.state.user_id,
+          }
+          axios.post('/api/paperInput/getSubject',post_data).then((response) => {
+                let res = response.data;
+                if (res.status === "success") {
+                   //后端回传
+                   window.alert(1);
+                   res.forEach((value,index) => {
+                       this.subjects.push({
+                           value: value.name,
+                           label: value.name,
+                           id: value.id
+                       })
+                   })
+                }
+                else{
+                    window.alert('前后端交互出现故障');
+                }}
+                )
+        //    axios({
+        //         url: '/api/paperInput/getSubject',
+        //         params: {
+        //            userId: this.$store.state.user_id,
+        //         },
+        //         headers: {
+        //           'Content-Type': 'application/json;charset=UTF-8'
+        //         },
+        //         method: 'post',
+        //       }).then((response) => {
+        //         let res = response.data;
+        //         if (res.status === "success") {
+        //            //后端回传
+        //            window.alert(1);
+        //            res.forEach((value,index) => {
+        //                this.subjects.push({
+        //                    value: value.name,
+        //                    label: value.name,
+        //                    id: value.id
+        //                })
+        //            })
+        //         }
+        //         else{
+        //             window.alert('前后端交互出现故障');
+        //         }}
+        //     )
+      },
+      getFirstKown(subjectId){
+           axios({
+                url: '/api/PaperInput/getFirstKnowledge',
+                data: {
+                   user_id: this.$store.state.user_id,
+                   subjectId: subjectId,
+                },
+                headers: {
+                  'Content-Type': 'application/json;charset=UTF-8'
+                },
+                method: 'post',
+              }).then((response) => {
+                let res = response.data;
+                if (res.status === "success") {
+                   //后端回传
+                   res.forEach((value,index) => {
+                       this.fisrtKownlege.push({
+                           value: value.name,
+                           label: value.name,
+                           id: value.id
+                       })
+                   })
+                }
+                else{
+                    window.alert('前后端交互出现故障');
+                }}
+            )
+      },
+      getSecondKown(fisrtK){
+          axios({
+                url: '/api/PaperInput/getSecondKnowledge',
+                data: {
+                   user_id: this.$store.state.user_id,
+                   firstKnowledgeId: fisrtK,
+                },
+                headers: {
+                  'Content-Type': 'application/json;charset=UTF-8'
+                },
+                method: 'post',
+              }).then((response) => {
+                let res = response.data;
+                if (res.status === "success") {
+                   //后端回传
+                   res.forEach((value,index) => {
+                       this.data.push({
+                           label: value.name,
+                           id: value.id,
+                           pinyin: value.name,
+                           key: index
+                       })
+                   })
+                }
+                else{
+                    window.alert('前后端交互出现故障');
+                }}
+            )
+      },
+      seePaper(){
+          document.getElementById('div5').style.display='none';
+        document.getElementById('div6').style.display='inline';
+        this.choose.forEach((value,index) =>{
+            document.getElementById('chooseDiv').innerHTML(value)
+        })
+        this.blank.forEach((value,index) =>{
+            document.getElementById('blankDiv').innerHTML(value)
+        })
+        this.answer.forEach((value,index) =>{
+            document.getElementById('answerDiv').innerHTML(value)
+        })
+           // window.alert(1);
+      },
+      print(){
+           let html = document.getElementById('div7').innerHTML;
+            //window.alert(html)
+            //html = html.html()
+            // 构造blob文件流
+            let html_ = new Blob([html],{ "type" : "text/html;charset=utf-8" })
+            let formdata = new FormData();
+            formdata.append('file', html_, `sdf.html`);//sdf.html是设置文件名
+            axios({
+                method: 'post',
+                url: '/api/PaperPrint',
+                data:formdata,
+                responseType:'blob',//这里如果不设置，下载会打不开文件
+            })
+            .then(res=>{
+                console.log('download res',res);
+                //通过后台返回 的word文件流设置文件名并下载
+                var blob = new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document;charset=utf-8'}); //application/vnd.openxmlformats-officedocument.wordprocessingml.document这里表示doc类型
+                var downloadElement = document.createElement('a');
+                var href = window.URL.createObjectURL(blob); //创建下载的链接
+                downloadElement.href = href;
+                downloadElement.download ='s.doc'; //下载后文件名
+                document.body.appendChild(downloadElement);
+                downloadElement.click(); //点击下载
+                document.body.removeChild(downloadElement); //下载完成移除元素
+                window.URL.revokeObjectURL(href); //释放掉blob对象
+            })
       }
     }
   };
