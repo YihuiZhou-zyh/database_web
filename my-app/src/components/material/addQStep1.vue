@@ -27,9 +27,9 @@
             return {
                 school: [],
                 subject:[],
-                ruleForm: {
-                    school: '',
-                    subject:''
+                ruleForm:{
+                  school:"",
+                    subject:""
                 },
                 newStep: '2',
                 rules: {
@@ -39,16 +39,25 @@
                     subject: [
                         { required: true, message: '请选择科目', trigger: 'change' }
                     ],
-                }
+                },
+
             };
         },
-
+        computed:{
+            // ruleForm: {
+            //     get() {
+            //         return {
+            //             school: this.$store.state.info_data[school],
+            //             subject:this.$store.state.info_data[subject]}
+            //     }
+            // }
+            },
         methods: {
-            ...mapMutations(['changeStep']),
+            ...mapMutations(['changeStep','getPostData']),
             //获取school
             getSchoolInfo(){
                 var self=this;
-                axios.get('/api/PaperInput/getSchool.json')
+                axios.get('/api/paperInput/getSchool', this.getPostData)
                     .then(function (res) {
                         res = res.data;
                         if (res.status === 'success'){
@@ -59,7 +68,7 @@
             //获取subjects
             getSubjectInfo(){
                 var self=this;
-                axios.get('/api/PaperInput/getSubject.json')
+                axios.get('/api/paperInput/getSubject', this.getPostData)
                     .then(function (res) {
                         res = res.data;
                         if (res.status === 'success'){
@@ -69,12 +78,14 @@
             },
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
-
+                    this.changeStep('2')
                     if (valid) {
-                        this.changeStep('2')
-                        console.log(this.$store.state.step)
+                        this.changeStep('2',this.info_data)
                     } else {
-                        console.log('error submit!!');
+                        this.$message({
+                            message: '提交失败',
+                            type: 'warning'
+                        });
                         return false;
                     }
                 });

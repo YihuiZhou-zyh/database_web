@@ -109,6 +109,7 @@
                     this.$store.state.identity = res.data.identity;
                     this.$store.state.user_id = res.data.userId;
                     this.$store.state.user_name = res.data.userName;
+                    this.$store.state.TOKEN = res.data.token;
                     //"identity":"3","userName":"zyh","userId":"6"
                     this.$router.push('./home')
                     this.$message({
