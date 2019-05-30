@@ -38,6 +38,7 @@
         },
         data(){
             return{
+
                 identity_to_name:{
                     '0':'非法用户',
                     '1':'试题录入员',

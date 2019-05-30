@@ -11,13 +11,19 @@ export default {
         }catch (e) {}
     },
     setDrawer: set('drawer'),
+    setSchool: set('school'),
+    setSubject: set('subject'),
     getIdentityName(state){
         return state.indentity_to_name[state.identity]
     },
-    getPostData(state){
+    getParams(state){
         return {
                 userid: state.user_id,
-                token: state.TOKEN
         }
-    }
+    },
+    getHeaders(state){
+        return{
+            'Authorization': state.TOKEN
+        }
+    },
 }

@@ -1,3 +1,10 @@
+const path = require('path')
+const webpack = require('webpack')
+
+
+function resolve(dir) {
+    return path.join(__dirname, dir)
+}
 module.exports = {
 //     baseUrl: process.env.NODE_ENV === 'production'
 //         ? '//your_url'

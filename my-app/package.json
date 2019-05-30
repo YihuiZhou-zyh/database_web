@@ -21,7 +21,8 @@
     "vuetify": "^1.5.5",
     "vuex": "^3.0.1",
     "webpack": "^4.31.0",
-    "webpack-dev-server": "^3.4.0"
+    "webpack-dev-server": "^3.4.0",
+    "qs": "latest"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.7.0",

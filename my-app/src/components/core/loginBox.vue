@@ -85,13 +85,39 @@
                     user_id: this.phone,
                     password: this.password
                 };
-                console.log(this.phone+this.password)
+                let self = this;
                 this.$refs['ruleForm']
                 if(this.phone!='' && this.password!='')
                     {
-
-                    axios.post('/api/login',post_data)
-                            .then(this.getHomeInfoSucc)
+                    this.post('/api/login', post_data)
+                        .then((res)=>{
+                            if(res.status==='success'){
+                                // resolve(res);
+                                this.$store.state.identity = res.data.identity;
+                                this.$store.state.user_id = res.data.userId;
+                                this.$store.state.user_name = res.data.userName;
+                                this.$store.state.TOKEN = res.data.token;
+                                //"identity":"3","userName":"zyh","userId":"6"
+                                this.$router.push('./home')
+                                this.$message({
+                                    message: '成功登录',
+                                    type: 'success'
+                                });
+                                self.getHomeInfoSucc(res)
+                            }else{
+                                //这里抛出的异常被下面的catch所捕获
+                                this.$message({
+                                    message: '账户或密码错误',
+                                    type: 'fail'
+                                });
+                                reject(error);
+                            }
+                        })
+                        .catch((err)=>{
+                            console.log(err)
+                        })
+                    // axios.post('/api/login',post_data)
+                    //         .then(this.getHomeInfoSucc)
                     }
                 else {
                     this.$message({
@@ -102,27 +128,6 @@
 
 
 
-            },
-            getHomeInfoSucc (res) {
-                res = res.data
-                if (res.status === 'success') {
-                    this.$store.state.identity = res.data.identity;
-                    this.$store.state.user_id = res.data.userId;
-                    this.$store.state.user_name = res.data.userName;
-                    this.$store.state.TOKEN = res.data.token;
-                    //"identity":"3","userName":"zyh","userId":"6"
-                    this.$router.push('./home')
-                    this.$message({
-                        message: '成功登录',
-                        type: 'success'
-                    });
-                }
-                else if(res.status === "fail" ){
-                    this.$message({
-                        message: '账户或密码错误',
-                        type: 'fail'
-                    });
-                }
             },
 
             countDown () {

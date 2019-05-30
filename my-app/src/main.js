@@ -11,6 +11,10 @@ import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
 import mavonEditor from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
+import {post} from './utils/api'
+//将方法挂载到Vue原型上
+// Vue.prototype.get = get;
+Vue.prototype.post = post;
 // use
 Vue.use(mavonEditor)
 Vue.use(ElementUI)
