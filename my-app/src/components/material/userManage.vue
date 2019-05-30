@@ -1,4 +1,30 @@
 <template>
+<div>
+  <div>
+      <el-button  type="primary" @click="addNew()">新增用户</el-button>
+
+<el-dialog title="新增用户" :visible.sync="dialogFormVisible">
+  <el-form :model="form">
+    <el-form-item label="账号" :label-width="formLabelWidth">
+      <el-input v-model="form.userId" auto-complete="off"></el-input>
+    </el-form-item>
+    <el-form-item label="密码" :label-width="formLabelWidth">
+      <el-input v-model="form.password" auto-complete="off"></el-input>
+    </el-form-item>
+    <el-form-item label="用户类型" :label-width="formLabelWidth">
+      <el-select v-model="form.type" placeholder="用户类型">
+        <el-option label="试题录入员" value="1"></el-option>
+        <el-option label="试题管理员" value="2"></el-option>
+      </el-select>
+    </el-form-item>
+  </el-form>
+  <div slot="footer" class="dialog-footer">
+    <el-button @click="dialogFormVisible = false">取 消</el-button>
+    <el-button type="primary" @click="submitAdd()">确 定</el-button>
+  </div>
+</el-dialog>
+
+    </div>
   <el-table
     :data="tableData"
     style="width: 100%">
@@ -42,10 +68,13 @@
 
       </template>
     </el-table-column>
+    
   </el-table>
+</div>
 </template>
 
 <script>
+import axios from 'axios'
   export default {
     data() {
       return {
@@ -71,6 +100,13 @@
         visible2: false,
         visible3: false,
         //tableData: []
+        dialogFormVisible: false,
+        form: {
+          userId: '',
+          password: '',
+          type: '',
+        },
+        formLabelWidth: '120px'
       }
     },
     methods: {
@@ -84,15 +120,19 @@
         axios({
             url:'/api/userManage/getUserList',
             headers: {Authorization: this.$store.state.token},
-            method:'get'
+            method:'get',
+            params: {
+              userId: this.$store.state.user_id
+            }
             }).then((response) => {
             let res = response.data;
-            if(res.status === "success") {
+            if(res.status == "success") {
+              window.alert('suc')
               this.tableData = res.data;
+              // id,phone,identity
             } else {
-              this.status1 = res.status;
-              this.errormsg1 = res.message;
-              this.$Message.info('获取失败： ' + this.errormsg1);
+              window.alert('fail')
+              this.$Message.info('获取失败： ');
             }
           })
       },
@@ -103,9 +143,14 @@
           type: 'warning'
         }).then(() => {
           axios({
-            url:'/api/userManage/setUserType/'+id,
+            url:'/api/userManage/setUserType',
             headers: {Authorization: this.$store.state.token},
-            method:'get'
+            method:'post',
+            data: {
+              user_id: this.$store.state.user_id,
+              setUserId: id,
+              type: 2
+            }
             }).then((response) => {
             let res = response.data;
             if(res.status === "success") {
@@ -135,9 +180,13 @@
           type: 'warning'
         }).then(() => {
           axios({
-            url:'/api/userManage/deleteUser/'+id,
+            url:'/api/userManage/deleteUser',
             headers: {Authorization: this.$store.state.token},
-            method:'get'
+            method:'post',
+            data: {
+              user_id: this.$store.state.user_id,
+              deleteUserId: id,
+            }
             }).then((response) => {
             let res = response.data;
             if(res.status === "success") {
@@ -159,7 +208,45 @@
             message: '已取消删除'
           });          
         });
-      }
+      },
+      addNew(){
+        this.dialogFormVisible = true;
+      },
+      submitAdd(){
+        if(this.form.userId==''||this.form.password==''||this.form.type==''){
+          window.alert('请填写完整')
+        }
+        else{
+          this.dialogFormVisible = false;
+          axios({
+            url: '/api/super/addUser',
+            params: {
+              user_phone: this.form.userId,
+              password: this.form.password,
+              identity: this.form.type,
+              userId: this.$store.state.user_id
+            },
+            headers: {Authorization: this.$store.state.token},
+            method:'post',
+          }).then((response) =>{
+            let res = response.data;
+            if(res.status === "success") {
+                this.$message({
+                type: 'success',
+                message: '添加成功!'
+              });
+            } else {
+              this.$Message.info('添加失败： ' );
+            }
+
+          })
+        }
+      },
+      
+    },
+    mounted(){
+      // window.alert('user')
+       this.getdata();
     }
   }
 </script>
