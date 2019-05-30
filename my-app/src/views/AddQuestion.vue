@@ -43,7 +43,7 @@ v-container
             mavon-editor(v-model="answer" @change="changeAnswer")
     v-btn(color='black', class="white--text", @click='submitForm')
         | 继续添加题目
-    v-btn.flat(@click="submitForm") 完成提交
+    v-btn.flat(@click="submit") 完成提交（清除当前页面）
 </template>
 
 <script>
@@ -124,10 +124,23 @@ v-container
         methods:
             {
                 ...mapMutations(["setSubject", "setSchool"]),
-
+                submit(){
+                    this.submitForm();
+                    this.selectedType= ""
+                        this.selectedSchool=""
+                        this.selectedGrade=""
+                        this.selectedSubject=""
+                        this.firstSelected =[]
+                        this.secondSelected=[]
+                        this.question=''
+                        this.analysis="略"
+                        this.answer=""
+                        this.value=1
+                },
 
                 submitForm() {
                     let id = null;
+                    self = this;
 
                     var promise = new Promise((resolve,reject)=>{
                         let url1 = '/api/PaperInput/contentInput';
@@ -143,15 +156,24 @@ v-container
                                 markdown_content: this.question,
                                 html_content: this.questionHtml
                             }
+
                         this.post(url1,data)
                             .then((res)=>{
                                 resolve(res);
                                 if(res.status === 'success'){
                                     id = res.data.problem_id
+                                    self.$message({
+                                        message: '上传成功',
+                                        type: 'success'
+                                    });
                                 }
                             })
                             .catch((err)=>{
                                 console.log(err)
+                                self.$message({
+                                    message: '上传失败',
+                                    type: 'error'
+                                });
                             })
                     });
                     promise.then((res)=>{
@@ -162,10 +184,15 @@ v-container
                                 markdown_content: this.answer,
                                 html_content: this.answerHtml
                         }
-                        this.post(ur2,data2)
+                        this.post(url2,data2)
                             .then((res)=>{
                                 //只有当url1请求到数据后才会调用url2，否则等待
+                                self.$message({
+                                    message: '上传成功',
+                                    type: 'success'
+                                });
                                 resolve(res);
+
                             })
                             .catch((err)=>{
                                 console.log(err)
@@ -174,13 +201,17 @@ v-container
                         let data3 = {
                             problem_id: id,
                             userId: this.$store.state.user_id,
-                            markdown_content: this.answer,
-                            html_content: this.answerHtml
+                            markdown_content: this.analysis,
+                            html_content: this.analysisHtml
                         }
                         this.post(url3,data3)
                             .then((res)=>{
                                 //只有当url1请求到数据后才会调用url2，否则等待
                                 resolve(res);
+                                self.$message({
+                                    message: '上传成功',
+                                    type: 'success'
+                                });
                             })
                             .catch((err)=>{
                                 console.log(err)
@@ -188,112 +219,6 @@ v-container
                     })
 
 
-
-
-
-                    //
-                    // axios({
-                    //         method: "post",
-                    //         url: '/api/PaperInput/contentInput',
-                    //         data: {
-                    //             userId: this.$store.state.user_id,
-                    //             school_id: this.selectedSchool, //学校id
-                    //             grade: this.selectedGrade,//年级
-                    //             subject_id: this.selectedSubject,//科目id
-                    //             type_id: this.selectedType,//题型id
-                    //             first_knowledge_id: this.firstSelected[0],
-                    //             second_knowldge_id: this.secondSelected[0],//二级知识点id
-                    //             hard_level: this.value,//难度系数
-                    //             markdown_content: this.question,
-                    //             html_content: this.questionHtml
-                    //         },
-                    //         headers: {
-                    //             'Authorization': this.$store.state.TOKEN,
-                    //         }
-                    //     }
-                    // )
-                    //     .then(function (res) {
-                    //         res = res.data;
-                    //         if (res.status === 'success') {
-                    //             id = res.data.problem_id
-                    //             this.$message({
-                    //                 message: '上传题目成功',
-                    //                 type: 'success'
-                    //             });
-                    //
-                    //             //answerInput
-                    //
-                    //             axios({
-                    //                     method: "post",
-                    //                     url: '/api/PaperInput/answerInput',
-                    //                     data: {
-                    //                         problem_id: id,
-                    //                         userId: this.$store.state.user_id,
-                    //                         markdown_content: this.answer,
-                    //                         html_content: this.answerHtml
-                    //                     },
-                    //                     headers: {
-                    //                         'Authorization': this.$store.state.TOKEN,
-                    //                     }
-                    //                 }
-                    //             ).then(function (res) {
-                    //                     res = res.data;
-                    //                     if (res.status === 'success') {
-                    //                         id = res.data.problem_id
-                    //                         this.$message({
-                    //                             message: '上传答案成功',
-                    //                             type: 'success'
-                    //                         });
-                    //                     }
-                    //                 }
-                    //             )
-                    //                 .catch(function (error) {
-                    //                     this.$message({
-                    //                         message: error,
-                    //                         type: 'error'
-                    //                     });
-                    //                 });
-                    //             //    analysisInput
-                    //             axios({
-                    //                     method: "post",
-                    //                     url: '/api/PaperInput/analysisInput',
-                    //                     data: {
-                    //                         problem_id: id,
-                    //                         userId: this.$store.state.user_id,
-                    //                         markdown_content: this.analysis,
-                    //                         html_content: this.analysisHtml
-                    //                     },
-                    //                     headers: {
-                    //                         'Authorization': this.$store.state.TOKEN,
-                    //                     }
-                    //                 }
-                    //             ).then(function (res) {
-                    //                     res = res.data;
-                    //                     if (res.status === 'success') {
-                    //                         id = res.data.problem_id
-                    //                         this.$message({
-                    //                             message: '上传解析成功',
-                    //                             type: 'success'
-                    //                         });
-                    //                     }
-                    //                 }
-                    //             )
-                    //                 .catch(function (error) {
-                    //                     this.$message({
-                    //                         message: error,
-                    //                         type: 'error'
-                    //                     });
-                    //                 });
-                    //
-                    //
-                    //         }
-                    //     })
-                    //     .catch(function (error) {
-                    //         this.$message({
-                    //             message: error,
-                    //             type: 'error'
-                    //         });
-                    //     });
                 },
 
                 changeQuestion(value, render){
@@ -404,12 +329,12 @@ v-container
                     var i;
                     var secondKnowledge=[];
                     for (i in self.firstSelected) {
-
+                        console.log(self.firstSelected[i])
                         axios(
                             { method:"get",
                                 url:'/api/PaperInput/getSecondKnowledge',
                                 params:{userId: this.$store.state.user_id,
-                                    firstKnowledgeId: i
+                                    firstKnowledgeId: self.firstSelected[i]
                                 },
 
                                 headers: {
@@ -421,18 +346,8 @@ v-container
                                 if (res.status === 'success') {
                                     secondKnowledge.push(...res.data)
                                 }
-
-
                             })
-                        // var post_data = {"firstKnowledgeId": id};
-                        // axios.post('/api/PaperInput/getSecondKnowledge.json', post_data)
-                        //     .then(function (res) {
-                        //         if (res.status === 'success') {
-                        //             self.secondKnowledge = res.data
-                        //         }
-                        //         console.log(res)
-                        //     })
-                    }
+                    };
                     this.secondKnowledge=secondKnowledge;
 
                 }

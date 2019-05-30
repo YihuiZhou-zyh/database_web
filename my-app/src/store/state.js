@@ -10,8 +10,7 @@ indentity_to_name = {
 };
 var default_user_id = '6';
 var default_user_name = "meow";
-var default_TOKEN = "\n" +
-    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2IiwiZXhwIjoxNTU5NTMxMzY0LCJpYXQiOjE1NTkwOTkzNjR9.oylfOycc0S8dtlfsqNsiFxm9jezw3oV1upr1NsocEcVJ5VjpJIXvnI_aQcM7SGEIdlXzJE73jwBMo1u4IvXqeQ";
+var default_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2IiwiZXhwIjoxNTU5NTMxMzY0LCJpYXQiOjE1NTkwOTkzNjR9.oylfOycc0S8dtlfsqNsiFxm9jezw3oV1upr1NsocEcVJ5VjpJIXvnI_aQcM7SGEIdlXzJE73jwBMo1u4IvXqeQ";
 let default_school =null
 let default_subject = null
 // try {

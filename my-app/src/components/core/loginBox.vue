@@ -85,7 +85,6 @@
                     user_id: this.phone,
                     password: this.password
                 };
-                let self = this;
                 this.$refs['ruleForm']
                 if(this.phone!='' && this.password!='')
                     {
@@ -103,7 +102,6 @@
                                     message: '成功登录',
                                     type: 'success'
                                 });
-                                self.getHomeInfoSucc(res)
                             }else{
                                 //这里抛出的异常被下面的catch所捕获
                                 this.$message({

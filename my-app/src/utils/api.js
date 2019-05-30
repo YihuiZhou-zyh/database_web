@@ -7,7 +7,8 @@
 import axios from "axios";
 import qs from 'qs';
 import TOKEN from '../store/state'
-axios.defaults.headers.post['Authorization'] = TOKEN;
+axios.defaults.headers.common['Authorization'] = TOKEN["TOKEN"]
+console.log(TOKEN["TOKEN"])
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 
 axios.interceptors.response.use(function (response){
